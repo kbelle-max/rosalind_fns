@@ -1,68 +1,94 @@
 def nuc_count(sequence):
+    """
+    returns the nucleotide count for a DNA sequence
+    """
     a_count = 0
     g_count = 0
     c_count = 0
     t_count = 0
 
-    for s in sequence:
-        if s == "A":
+    for nucleotide in sequence:
+        if nucleotide == "A":
             a_count += 1
-        elif s == "G":
+        elif nucleotide == "G":
             g_count += 1
-        elif s == "C":
+        elif nucleotide == "C":
             c_count += 1
-        elif s == "T":
+        elif nucleotide == "T":
             t_count += 1
     return a_count, c_count, g_count, t_count
 
 
 def transcribe(sequence):
+    """
+    transcribes DNA sequence to
+    """
     rna = ""
-    for s in sequence:
-        if s == "T":
+    for nucleotide in sequence:
+        if nucleotide == "T":
             rna += "U"
         else:
-            rna += s
+            rna += nucleotide
     return rna
 
 
 def compliment_seq(sequence):
-    rev_seq = sequence[::-1]
+    """
+    returns the reverse compliment DNA sequence
+    """
+
     compliment = ""
-    for s in rev_seq:
-        if s == "A":
+    for nucleotide in sequence:
+        if nucleotide == "A":
             compliment += "T"
-        elif s == "G":
+        elif nucleotide == "G":
             compliment += "C"
-        elif s == "C":
+        elif nucleotide == "C":
             compliment += "G"
-        elif s == "T":
+        elif nucleotide == "T":
             compliment += "A"
-    return compliment
+    return compliment[::-1]
 
 
-def gc_content(path):
-    file = path
+def fasta_to_dict(path):
+    """
+    simple fasta converter for rosalind problems
+    given a path to a fasta file returns a dictionary where the key
+    is the identifier and the sequence is the value
+    """
     fast_dict = {}
-    count_dict = {}
-    fasta_raw = file.readlines()
-    # split fasta sequences into dictionary
+    fasta_raw = path.readlines()
     for val in fasta_raw:
         ls = ''
         if val[0] == '>':
-            fast_dict[val[1:14]] = ''
+            fast_dict[val[1:]] = ''
         else:
             for key in fast_dict:
                 ls += str(val.replace('\n', ''))
                 fast_dict[key] += ls
+    return fast_dict
+
+
+def gc_content(path):
+    """given a fasta file retuns a dictionary where each identifier
+    is the key and the value is the GC content percentage"""
+    fast_dict = fasta_to_dict(path)
+    count_dict = {}
+    # split fasta sequences into dictionary
     for key in fast_dict:
-        count_dict[key] = ((nuc_count(fast_dict[key])[1] + nuc_count(fast_dict[key])[2]) / sum(
-            nuc_count(fast_dict[key])) * 100)
+        count_dict[key] = ((nuc_count(fast_dict[key])[1] +
+                            nuc_count(fast_dict[key])[2]) /
+                           sum(nuc_count(fast_dict[key])) *
+                           100)
 
     return count_dict
 
 
 def translate(sequence):
+    """
+    returns a protein sequence given an rna sequence
+
+    """
     protein = ''
     codon = ''
 
@@ -95,6 +121,10 @@ def translate(sequence):
 
 
 def count_point_mutations(str1, str2):
+    """
+    counts the nucleotide differences given 2 sequences
+
+    """
     mistakes = 0
     for i in range(len(str1)):
         if str1[i] != str2[i]:
@@ -103,6 +133,9 @@ def count_point_mutations(str1, str2):
 
 
 def protein_mass_calc(amino_seq):
+    """
+    returns the mass of  protein in Daltons
+    """
     protein_mass = 0
 
     aa = {'A': 71.03711, 'R': 156.10111, 'N': 114.04293,
@@ -119,24 +152,14 @@ def protein_mass_calc(amino_seq):
     return round(protein_mass, 3)
 
 
-
-
-def rabbit_recurrance(n,k):
-    a, b = 0,
-    for i in range(0, n):
-        a, b = b, a + b
-    return a
-def find_motifs(sequence, trace):
-    mot = sequence.find(trace, 0)
-    motif = []
+def find_motifs(sequence, subsequence):
+    """
+    returns all locations of a subsequence within a sequence
+    """
+    mot = sequence.find(subsequence, 0)
+    motifs = []
     while mot >= 0:
-        motif.append(mot)
-        mot = sequence.find(trace, mot + 1)
-    motif = [x + 1 for x in motif]
-    return motif
-
-def edge_match(fasta,edgesize):
-    from Bio import SeqIO
-    input_file = open(fasta)
-    my_dict = SeqIO.to_dict(SeqIO.parse(input_file, "fasta"))
-    return my_dict
+        motifs.append(mot)
+        mot = sequence.find(subsequence, mot + 1)
+    motifs = [x + 1 for x in motifs]
+    return motifs
