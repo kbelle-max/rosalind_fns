@@ -1,3 +1,5 @@
+# Kareem Belle,  2017 
+
 def nuc_count(sequence):
     """
     returns the nucleotide count for a DNA sequence
